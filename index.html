@@ -77,12 +77,10 @@
             const cityInput = document.getElementById('cityInput');
             const resultDiv = document.getElementById('result');
             const weatherTableBody = document.getElementById('weatherTableBody');
-            resultDiv.textContent = ''; // Clear previous result
-            weatherTableBody.innerHTML = ''; // Clear previous table content
-
+            resultDiv.textContent = ''; 
+            weatherTableBody.innerHTML = ''; 
             const cities = cityInput.value.split(',').map(city => city.trim());
             console.log(cities);
-
             try {
                 const response = await fetch('http://localhost:3000/getWeather/', {
                     method: 'POST',
@@ -91,23 +89,16 @@
                     },
                     body: JSON.stringify({ cities })
                 });
-
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
                 const data = await response.json();
                 const weatherData = data.weather;
-
                 for (const city in weatherData) {
                     const temperature = weatherData[city];
-
-                    // Create a new row in the table
                     const row = weatherTableBody.insertRow();
                     const cell1 = row.insertCell(0);
                     const cell2 = row.insertCell(1);
-
-                    // Set the city and temperature in the row
                     cell1.textContent = city.charAt(0).toUpperCase() + city.slice(1);
                     cell2.textContent = temperature;
                 }
