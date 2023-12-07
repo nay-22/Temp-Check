@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        h1 {
+            margin-bottom: 70px;
+        }
+
+        input {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            width: 315px;
+            height: 30px;
+        }
+
+        button {
+            border: none;
+            border-radius: .7em;
+            font-size: 1.2em;
+            padding: 1em;
+            background-color: rgb(160, 206, 246);
+            font-weight: bold;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #a7a7a7;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: rgb(160, 206, 246);
+        }
+
+        #result {
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Weather App</h1>
+    <input type="text" id="cityInput" placeholder="Enter city names (comma-separated)">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="result"></div>
+    <table id="weatherTable">
+        <thead>
+            <tr>
+                <th>City</th>
+                <th>Temperature</th>
+            </tr>
+        </thead>
+        <tbody id="weatherTableBody"></tbody>
+    </table>
+
+    <script>
+        async function getWeather() {
+            const cityInput = document.getElementById('cityInput');
+            const resultDiv = document.getElementById('result');
+            const weatherTableBody = document.getElementById('weatherTableBody');
+            resultDiv.textContent = ''; // Clear previous result
+            weatherTableBody.innerHTML = ''; // Clear previous table content
+
+            const cities = cityInput.value.split(',').map(city => city.trim());
+            console.log(cities);
+
+            try {
+                const response = await fetch('http://localhost:3000/getWeather/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ cities })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const weatherData = data.weather;
+
+                for (const city in weatherData) {
+                    const temperature = weatherData[city];
+
+                    // Create a new row in the table
+                    const row = weatherTableBody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+
+                    // Set the city and temperature in the row
+                    cell1.textContent = city.charAt(0).toUpperCase() + city.slice(1);
+                    cell2.textContent = temperature;
+                }
+            } catch (error) {
+                console.error('Error fetching weather data:', error.message);
+                resultDiv.textContent = 'Error fetching weather data. Please try again.';
+            }
+        }
+    </script>
+</body>
+
+</html>
